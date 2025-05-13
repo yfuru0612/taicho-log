@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>体調ログ</title>
+</head>
+<body>
+  <h1>体調ログフォーム</h1>
+  <form id="logForm">
+    <label>日付: <input type="date" name="date" required></label><br>
+    <label>時間: <input type="time" name="time" required></label><br>
+    <label>ログ内容:
+      <select name="logType" required>
+        <option value="体調">体調</option>
+        <option value="食事">食事</option>
+      </select>
+    </label><br>
+    <label>項目名: <input type="text" name="item" required></label><br>
+    <label>値: <input type="text" name="value" required></label><br>
+    <button type="submit">送信</button>
+  </form>
+
+  <script>
+    const webhookUrl = "https://script.google.com/macros/s/AKfycbxAltJeEpITpjiuao5V1tAXjpWNnDrxbuDnPHsOMKzqcRjSU6mLSz0B0_8D1uTz5FV00g/exec";
+
+    document.getElementById("logForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const payload = {
+        date: form.get("date"),
+        time: form.get("time"),
+        logType: form.get("logType"),
+        entries: [{
+          name: form.get("item"),
+          value: form.get("value")
+        }]
+      };
+
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert("送信完了！");
+        e.target.reset();
+      } else {
+        alert("送信に失敗しました");
+      }
+    });
+  </script>
+</body>
+</html>
